@@ -11,10 +11,12 @@ RUN npm run build
 # Stage 2: Build Backend
 FROM golang:1.23-alpine AS backend-builder
 WORKDIR /app
+RUN apk add --no-cache git
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o server cmd/main.go
+ARG TARGETARCH
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=$TARGETARCH go build -o server cmd/main.go
 
 # Stage 3: Final Image
 FROM alpine:latest
