@@ -100,7 +100,7 @@ export function AddKeyDialog({ open, onOpenChange, onAdd }: AddKeyDialogProps) {
           <DialogFooter>
             <Button
               type="button"
-              variant="outline"
+              variant="ghost"
               size="lg"
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}

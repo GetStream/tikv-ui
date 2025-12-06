@@ -50,7 +50,7 @@ export function DeleteKeyDialog({
         </DialogHeader>
         <DialogFooter>
           <Button
-            variant="outline"
+            variant="ghost"
             onClick={() => onOpenChange(false)}
             disabled={deleting}
             size="lg"
