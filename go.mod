@@ -1,6 +1,6 @@
 module github.com/darkoatanasovski/tikv-ui
 
-go 1.25.1
+go 1.23.0
 
 require (
 	github.com/tikv/client-go/v2 v2.0.7
