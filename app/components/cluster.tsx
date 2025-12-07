@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
-export default function Cluster() {
+export default function Cluster({ onChange }: { onChange?: () => void }) {
   const { clusters, listClusters, switchCluster } = useCluster();
   const [open, setOpen] = useState(false);
 
@@ -22,6 +22,7 @@ export default function Cluster() {
   const handleSwitch = async (name: string) => {
     await switchCluster(name);
     setOpen(false);
+    onChange?.();
   };
 
   if (!activeCluster && clusters.length === 0) return null;

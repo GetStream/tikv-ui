@@ -107,7 +107,7 @@ export default function Home() {
             <div>Select a key to view details</div>
           </div>
         )}
-        <Cluster />
+        <Cluster onChange={() => loadKeys("", "", true)} />
       </div>
 
       <DeleteKeyDialog
