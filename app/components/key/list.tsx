@@ -37,7 +37,7 @@ export function KeyList({
 }: KeyListProps) {
   return (
     <div className="flex-1 min-w-0 overflow-hidden">
-      <div className="p-4 pr-10">
+      <div className="p-4">
         <Input
           placeholder="Search keys..."
           value={searchQuery}
@@ -66,7 +66,7 @@ export function KeyList({
                     key={item.key}
                     onClick={() => setSelectedItem(item)}
                     className={cn(
-                      "p-2 rounded hover:bg-primary/30 cursor-pointer text-sm font-mono w-[250px] rounded-md",
+                      "p-2 rounded hover:bg-primary/30 cursor-pointer text-sm font-mono w-[280px] rounded-md",
                       selectedItem?.key === item.key ? "bg-primary" : ""
                     )}
                   >

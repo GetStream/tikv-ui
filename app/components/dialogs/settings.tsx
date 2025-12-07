@@ -26,9 +26,14 @@ type FormValues = z.infer<typeof formSchema>;
 interface SettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onChange?: () => void;
 }
 
-export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
+export function SettingsDialog({
+  open,
+  onOpenChange,
+  onChange,
+}: SettingsDialogProps) {
   const { connectCluster } = useCluster();
 
   const {
@@ -60,6 +65,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
       const name = "cluster-" + Date.now();
 
       await connectCluster(name, addrs);
+      onChange?.();
 
       localStorage.setItem("tikv_pd_addrs", data.pdAddrs);
       onOpenChange(false);

@@ -50,7 +50,11 @@ export default function Sidebar({
           </Button>
         </div>
       </div>
-      <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
+      <SettingsDialog
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
+        onChange={() => loadKeys("", "", true)}
+      />
 
       <AddKeyDialog
         open={addDialogOpen}
