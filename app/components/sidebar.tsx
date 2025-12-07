@@ -6,12 +6,21 @@ import TiKV from "@/assets/img/tikv.webp";
 import { SettingsDialog } from "./dialogs/settings";
 import { AddKeyDialog } from "./dialogs/addkey";
 
+interface SidebarProps {
+  addKey: (key: string, value: string) => Promise<void>;
+  loadKeys: (key: string, endKey: string, reverse: boolean) => void;
+  getNextKey: (key: string) => string;
+  searchQuery: string;
+  listClusters: () => void;
+}
+
 export default function Sidebar({
   addKey,
   loadKeys,
   getNextKey,
   searchQuery,
-}: any) {
+  listClusters,
+}: SidebarProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
@@ -53,7 +62,10 @@ export default function Sidebar({
       <SettingsDialog
         open={settingsOpen}
         onOpenChange={setSettingsOpen}
-        onChange={() => loadKeys("", "", true)}
+        onChange={() => {
+          listClusters();
+          loadKeys("", "", true);
+        }}
       />
 
       <AddKeyDialog

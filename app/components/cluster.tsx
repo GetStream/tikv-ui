@@ -1,5 +1,4 @@
 import { CheckCircle2Icon, ServerIcon } from "lucide-react";
-import { useCluster } from "@/hooks/use-cluster";
 import { useEffect, useState } from "react";
 import {
   Dialog,
@@ -8,21 +7,25 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { ClusterInfo } from "@/hooks/use-cluster";
 
-export default function Cluster({ onChange }: { onChange?: () => void }) {
-  const { clusters, listClusters, switchCluster } = useCluster();
+export default function Cluster({
+  onChange,
+  switchCluster,
+  clusters,
+}: {
+  onChange: () => void;
+  switchCluster: (name: string) => Promise<void>;
+  clusters: ClusterInfo[];
+}) {
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    listClusters();
-  }, [listClusters]);
 
   const activeCluster = clusters.find((c) => c.active);
 
   const handleSwitch = async (name: string) => {
     await switchCluster(name);
-    setOpen(false);
     onChange?.();
+    setOpen(false);
   };
 
   if (!activeCluster && clusters.length === 0) return null;

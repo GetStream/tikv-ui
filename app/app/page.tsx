@@ -10,6 +10,7 @@ import { KeyList } from "@/components/key/list";
 import { KeyDetailsContent } from "@/components/key/content";
 import { KeyDetailsHeader } from "@/components/key/header";
 import Cluster from "@/components/cluster";
+import { useCluster } from "@/hooks/use-cluster";
 
 export default function Home() {
   const {
@@ -27,6 +28,7 @@ export default function Home() {
   const [view, setView] = useState<"raw" | "parsed">("parsed");
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { clusters, listClusters, switchCluster } = useCluster();
 
   const [pdAddrs, setPdAddrs] = useState("");
 
@@ -39,8 +41,9 @@ export default function Home() {
 
   // Initial load
   useEffect(() => {
+    listClusters();
     loadKeys("", "", true);
-  }, [loadKeys]);
+  }, [loadKeys, listClusters]);
 
   // Debounced search effect
   useEffect(() => {
@@ -77,6 +80,7 @@ export default function Home() {
           loadKeys={loadKeys}
           getNextKey={getNextKey}
           searchQuery={searchQuery}
+          listClusters={listClusters}
         />
         <KeyList
           keys={keys}
@@ -103,11 +107,15 @@ export default function Home() {
           <KeyDetailsContent selectedItem={selectedItem} view={view} />
         ) : (
           <div className="flex flex-col items-center justify-center gap-2 h-screen opacity-70">
-            <MousePointerClickIcon size={130} />
+            <MousePointerClickIcon size={130} className="opacity-50" />
             <div>Select a key to view details</div>
           </div>
         )}
-        <Cluster onChange={() => loadKeys("", "", true)} />
+        <Cluster
+          onChange={() => loadKeys("", "", true)}
+          switchCluster={switchCluster}
+          clusters={clusters}
+        />
       </div>
 
       <DeleteKeyDialog
