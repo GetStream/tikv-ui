@@ -43,7 +43,7 @@ func main() {
 	for i, cluster := range clusterStrs[1:] {
 		srv.AddCluster(ctx, fmt.Sprintf("cluster-%d", time.Now().Unix()+int64(i)), utils.SplitAndTrim(cluster, ","))
 	}
-	fmt.Println(srv.ListClusters())
+
 	mux := http.NewServeMux()
 
 	// Health check
