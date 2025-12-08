@@ -1,5 +1,7 @@
 # TiKV UI
 
+<img width="5120" height="2826" alt="image" src="https://github.com/user-attachments/assets/89119f76-1ad4-4492-a05a-b271ce5d9722" />
+
 A REST API server for exploring and managing TiKV key-value data with multi-cluster support.
 
 ## Project Structure
