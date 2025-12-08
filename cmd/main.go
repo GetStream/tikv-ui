@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -17,12 +19,13 @@ import (
 )
 
 func main() {
-	// Read PD addresses from env: TIKV_PD_ADDRS="127.0.0.1:2379,127.0.0.1:23790"
+	// Read PD addresses from env: TIKV_PD_ADDRS="127.0.0.1:2379,127.0.0.1:2381"
 	pdAddrsEnv := os.Getenv("TIKV_PD_ADDRS")
 	if pdAddrsEnv == "" {
 		log.Fatal("TIKV_PD_ADDRS env var is required (comma-separated PD addresses)")
 	}
-	pdAddrs := utils.SplitAndTrim(pdAddrsEnv, ",")
+	clusterStrs := strings.Split(strings.Trim(pdAddrsEnv, ";"), ";")
+	pdAddrs := utils.SplitAndTrim(clusterStrs[0], ",")
 
 	ctx := context.Background()
 
@@ -37,6 +40,10 @@ func main() {
 	srv := server.New(cli, pdAddrs)
 	defer srv.Close()
 
+	for i, cluster := range clusterStrs[1:] {
+		srv.AddCluster(ctx, fmt.Sprintf("cluster-%d", time.Now().Unix()+int64(i)), utils.SplitAndTrim(cluster, ","))
+	}
+	fmt.Println(srv.ListClusters())
 	mux := http.NewServeMux()
 
 	// Health check
