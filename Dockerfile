@@ -19,7 +19,7 @@ ARG TARGETARCH
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=$TARGETARCH go build -o server cmd/main.go
 
 # Stage 3: Final Image
-FROM alpine:3:22
+FROM alpine:3.23.0
 WORKDIR /app
 RUN apk --no-cache add ca-certificates
 
