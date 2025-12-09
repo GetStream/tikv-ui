@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/darkoatanasovski/tikv-ui/pkg/server"
-	"github.com/darkoatanasovski/tikv-ui/pkg/types"
-	"github.com/darkoatanasovski/tikv-ui/pkg/utils"
+	"github.com/GetStream/tikv-ui/pkg/server"
+	"github.com/GetStream/tikv-ui/pkg/types"
+	"github.com/GetStream/tikv-ui/pkg/utils"
 )
 
 // Delete handles DELETE requests to remove a key from TiKV

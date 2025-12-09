@@ -11,9 +11,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/darkoatanasovski/tikv-ui/pkg/handlers"
-	"github.com/darkoatanasovski/tikv-ui/pkg/server"
-	"github.com/darkoatanasovski/tikv-ui/pkg/utils"
+	"github.com/GetStream/tikv-ui/pkg/handlers"
+	"github.com/GetStream/tikv-ui/pkg/server"
+	"github.com/GetStream/tikv-ui/pkg/utils"
 	"github.com/tikv/client-go/v2/config"
 	"github.com/tikv/client-go/v2/rawkv"
 )

@@ -3,8 +3,8 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/darkoatanasovski/tikv-ui/pkg/server"
-	"github.com/darkoatanasovski/tikv-ui/pkg/utils"
+	"github.com/GetStream/tikv-ui/pkg/server"
+	"github.com/GetStream/tikv-ui/pkg/utils"
 )
 
 // Health returns a simple health check response

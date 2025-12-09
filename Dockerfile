@@ -1,5 +1,5 @@
 # Stage 1: Build Frontend
-FROM node:20-alpine AS frontend-builder
+FROM node:22-alpine AS frontend-builder
 WORKDIR /app
 COPY app/package.json app/yarn.lock* app/package-lock.json* ./
 RUN npm install
@@ -9,7 +9,7 @@ ENV NEXT_PUBLIC_API_URL=""
 RUN npm run build
 
 # Stage 2: Build Backend
-FROM golang:1.23-alpine AS backend-builder
+FROM golang:1.25-alpine AS backend-builder
 WORKDIR /app
 RUN apk add --no-cache git
 COPY go.mod go.sum ./
@@ -19,7 +19,7 @@ ARG TARGETARCH
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=$TARGETARCH go build -o server cmd/main.go
 
 # Stage 3: Final Image
-FROM alpine:latest
+FROM alpine:3:22
 WORKDIR /app
 RUN apk --no-cache add ca-certificates
 
