@@ -79,7 +79,7 @@ export function KeyList({
               })}
 
               {hasMore ? (
-                <div className="pt-2 pb-20 px-2">
+                <div className="pt-2 pb-20">
                   <Button
                     variant="secondary"
                     className="w-full"
