@@ -67,7 +67,9 @@ export function KeyList({
                     onClick={() => setSelectedItem(item)}
                     className={cn(
                       "p-2 rounded hover:bg-primary/30 cursor-pointer text-sm font-mono w-[280px] rounded-md",
-                      selectedItem?.key === item.key ? "bg-primary" : ""
+                      selectedItem?.key === item.key
+                        ? "bg-primary text-white"
+                        : ""
                     )}
                   >
                     <div className="flex items-center gap-2">
@@ -83,6 +85,7 @@ export function KeyList({
                   <Button
                     variant="secondary"
                     className="w-full"
+                    size="lg"
                     onClick={() => {
                       const last = keys[keys.length - 1];
                       if (last) {

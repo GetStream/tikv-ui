@@ -22,13 +22,15 @@
   --color-input: hsl(240 5.9% 90%);
   --color-ring: hsl(346.8 77.2% 49.8%);
   --radius: 0.65rem;
+  --color-menu: #eee;
 }
 
 @layer base {
   .dark {
-    --color-background: hsl(20 14.3% 4.1%);
-    --color-foreground: hsl(0 0% 95%);
-    --color-popover: hsl(0 0% 9%);
+    --color-menu: #1b1b1f;
+    --color-background: #16161a;
+    --color-foreground: #94a1b2;
+    --color-popover: #16161ad6;
     --color-popover-foreground: hsl(0 0% 95%);
     --color-card: hsl(24 9.8% 10%);
     --color-card-foreground: hsl(0 0% 95%);

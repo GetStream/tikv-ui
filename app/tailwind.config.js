@@ -9,6 +9,7 @@ module.exports = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        menu: "var(--color-menu)",
         card: {
           DEFAULT: "var(--card)",
           foreground: "var(--card-foreground)",

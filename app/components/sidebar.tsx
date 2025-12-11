@@ -36,7 +36,7 @@ export default function Sidebar({
   };
   return (
     <>
-      <div className="p-4 border-r border-border flex flex-col justify-between items-center">
+      <div className="p-4 flex flex-col justify-between items-center bg-menu">
         <a href="">
           <Image src={TiKV.src} alt="Logo" width={32} height={32} />
         </a>
