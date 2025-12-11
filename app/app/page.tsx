@@ -106,9 +106,9 @@ export default function Home() {
         {selectedItem ? (
           <KeyDetailsContent selectedItem={selectedItem} view={view} />
         ) : (
-          <div className="flex flex-col items-center justify-center gap-2 h-screen opacity-70">
+          <div className="flex flex-col items-center justify-center gap-2 h-screen opacity-50">
             <MousePointerClickIcon size={130} className="opacity-50" />
-            <div>Select a key to view details</div>
+            <div className="text-sm">Select a key to view details</div>
           </div>
         )}
         <Cluster
