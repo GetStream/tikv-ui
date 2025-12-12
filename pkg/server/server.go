@@ -25,9 +25,9 @@ type Server struct {
 }
 
 // New creates a new Server instance with an initial connection
-func New(client *rawkv.Client, pdAddrs []string) *Server {
+func New(client *rawkv.Client, pdAddrs []string, name string) *Server {
 	defaultConn := &ClusterConnection{
-		Name:      "default",
+		Name:      name,
 		PDAddrs:   pdAddrs,
 		Client:    client,
 		ClusterID: client.ClusterID(),
@@ -35,9 +35,9 @@ func New(client *rawkv.Client, pdAddrs []string) *Server {
 
 	return &Server{
 		clusters: map[string]*ClusterConnection{
-			"default": defaultConn,
+			name: defaultConn,
 		},
-		activeCluster:  "default",
+		activeCluster:  name,
 		defaultPDAddrs: pdAddrs,
 	}
 }

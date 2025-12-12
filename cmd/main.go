@@ -2,12 +2,10 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
 
@@ -19,29 +17,30 @@ import (
 )
 
 func main() {
-	// Read PD addresses from env: TIKV_PD_ADDRS="127.0.0.1:2379,127.0.0.1:2381"
+	// Read PD addresses from env: TIKV_PD_ADDRS="127.0.0.1:2379|My Cluster 1,127.0.0.1:2381;server-2.com:2379|Cluster 2"
 	pdAddrsEnv := os.Getenv("TIKV_PD_ADDRS")
 	if pdAddrsEnv == "" {
 		log.Fatal("TIKV_PD_ADDRS env var is required (comma-separated PD addresses)")
 	}
-	clusterStrs := strings.Split(strings.Trim(pdAddrsEnv, ";"), ";")
-	pdAddrs := utils.SplitAndTrim(clusterStrs[0], ",")
-
+	clusters := utils.GetClusters(pdAddrsEnv)
+	if len(clusters) == 0 {
+		log.Fatal("no clusters found")
+	}
 	ctx := context.Background()
 
 	// Create TiKV RawKV client for default cluster
-	cli, err := rawkv.NewClient(ctx, pdAddrs, config.DefaultConfig().Security)
+	cli, err := rawkv.NewClient(ctx, clusters[0].PDAddrs, config.DefaultConfig().Security)
 	if err != nil {
 		log.Fatalf("failed to create TiKV RawKV client: %v", err)
 	}
 
 	log.Printf("Connected to default TiKV cluster ID: %d", cli.ClusterID())
 
-	srv := server.New(cli, pdAddrs)
+	srv := server.New(cli, clusters[0].PDAddrs, clusters[0].Name)
 	defer srv.Close()
 
-	for i, cluster := range clusterStrs[1:] {
-		srv.AddCluster(ctx, fmt.Sprintf("cluster-%d", time.Now().Unix()+int64(i)), utils.SplitAndTrim(cluster, ","))
+	for _, cluster := range clusters[1:] {
+		srv.AddCluster(ctx, cluster.Name, cluster.PDAddrs)
 	}
 
 	mux := http.NewServeMux()
