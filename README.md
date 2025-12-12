@@ -2,7 +2,7 @@
 
 ![Stream](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/HayesGordon/e7f3c4587859c17f3e593fd3ff5b13f4/raw/11d9d9385c9f34374ede25f6471dc743b977a914/badge.json)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/GetStream/tikv-ui)
-![GitHub license](https://img.shields.io/github/license/GetStream/tikv-ui/LICENSE)
+![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
 ![GitHub contributors](https://img.shields.io/github/contributors/GetStream/tikv-ui)
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/GetStream)](https://github.com/sponsors/GetStream)
 
