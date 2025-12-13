@@ -1,4 +1,6 @@
-# 🚀 TiKV Admin Web UI
+<img width="1408" height="587" alt="cover" src="https://github.com/user-attachments/assets/1eeb1776-637f-4abe-98f1-6834b290601f" />
+
+#
 
 ![Stream](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/HayesGordon/e7f3c4587859c17f3e593fd3ff5b13f4/raw/11d9d9385c9f34374ede25f6471dc743b977a914/badge.json)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/GetStream/tikv-ui)
@@ -7,14 +9,13 @@
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/GetStream)](https://github.com/sponsors/GetStream)
 
 
-<img width="3308" height="2540" alt="frame_chrome_mac_dark" src="https://github.com/user-attachments/assets/6ca98028-57e1-44f4-8f60-ac9a542a427e" />
-
-
 ## 🌟 Overview
 
 **TiKV Admin Web UI is a full-stack web application and REST API for the powerful, intuitive management of TiKV clusters.**
 
 Tired of juggling command-line tools? This project provides a dedicated, graphical frontend interface for exploring your data, managing cluster connections, and performing raw key-value manipulation with ease.
+
+<img width="1408" height="736" alt="full" src="https://github.com/user-attachments/assets/2fcb16c3-e403-41e6-9832-6a36fa5d2e4f" />
 
 ## ✨ Key Features
 
@@ -26,7 +27,7 @@ This application is built to be the essential administrative tool for your TiKV 
 - **💻 Dedicated Web Frontend:** A modern interface built with TypeScript, offering a smooth and efficient way to interact with your key-value store.
 - **🔌 Comprehensive REST API:** An easy-to-use API backend allows for integration into custom monitoring or automation workflows.
 
---
+
 
 ## 🚀 Getting Started
 
