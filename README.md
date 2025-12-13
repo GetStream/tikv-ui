@@ -6,6 +6,10 @@
 ![GitHub contributors](https://img.shields.io/github/contributors/GetStream/tikv-ui)
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/GetStream)](https://github.com/sponsors/GetStream)
 
+
+<img width="3308" height="2540" alt="frame_chrome_mac_dark" src="https://github.com/user-attachments/assets/6ca98028-57e1-44f4-8f60-ac9a542a427e" />
+
+
 ## 🌟 Overview
 
 **TiKV Admin Web UI is a full-stack web application and REST API for the powerful, intuitive management of TiKV clusters.**
