@@ -147,3 +147,10 @@ We welcome contributions from the community! If you're interested in making the 
 - Report bugs and suggest features.
 - Submit pull requests.
 - Join the discussion.
+
+## We are hiring!
+
+We recently closed a [$38 million Series B funding round](https://techcrunch.com/2021/03/04/stream-raises-38m-as-its-chat-and-activity-feed-apis-power-communications-for-1b-users/) and are actively growing.
+Our APIs are used by more than a billion end-users, and by working at Stream, you have the chance to make a huge impact on a team of very strong engineers.
+
+Check out our current openings and apply via [Stream's website](https://getstream.io/team/#jobs).
