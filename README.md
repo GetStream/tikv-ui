@@ -15,8 +15,6 @@
 
 Tired of juggling command-line tools? This project provides a dedicated, graphical frontend interface for exploring your data, managing cluster connections, and performing raw key-value manipulation with ease.
 
-<img width="1408" height="736" alt="full" src="https://github.com/user-attachments/assets/2fcb16c3-e403-41e6-9832-6a36fa5d2e4f" />
-
 ## ✨ Key Features
 
 This application is built to be the essential administrative tool for your TiKV deployment:
