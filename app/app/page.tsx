@@ -5,11 +5,9 @@ import { useEffect, useState } from "react";
 import { DeleteKeyDialog } from "@/components/dialogs/deletekey";
 
 import { useKeys, ScanItem } from "@/hooks/use-keys";
-import Sidebar from "@/components/sidebar";
 import { KeyList } from "@/components/key/list";
 import { KeyDetailsContent } from "@/components/key/content";
 import { KeyDetailsHeader } from "@/components/key/header";
-import Cluster from "@/components/cluster";
 import { useCluster } from "@/hooks/use-cluster";
 
 export default function Home() {
@@ -73,19 +71,13 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-1 flex-row h-screen">
+    <>
       <div className="flex flex-1 flex-row border-r border-border max-w-sm">
-        <Sidebar
-          addKey={addKey}
-          loadKeys={loadKeys}
-          getNextKey={getNextKey}
-          searchQuery={searchQuery}
-          listClusters={listClusters}
-        />
         <KeyList
           keys={keys}
           loading={loading}
           error={error}
+          addKey={addKey}
           hasMore={hasMore}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -111,11 +103,6 @@ export default function Home() {
             <div className="text-sm">Select a key to view details</div>
           </div>
         )}
-        <Cluster
-          onChange={() => loadKeys("", "", true)}
-          switchCluster={switchCluster}
-          clusters={clusters}
-        />
       </div>
 
       <DeleteKeyDialog
@@ -124,6 +111,6 @@ export default function Home() {
         itemKey={selectedItem?.key}
         onConfirm={handleDeleteWrapper}
       />
-    </div>
+    </>
   );
 }

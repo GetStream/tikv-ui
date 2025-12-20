@@ -11,6 +11,7 @@ import (
 
 	"github.com/GetStream/tikv-ui/pkg/handlers"
 	"github.com/GetStream/tikv-ui/pkg/server"
+	"github.com/GetStream/tikv-ui/pkg/services"
 	"github.com/GetStream/tikv-ui/pkg/utils"
 	"github.com/tikv/client-go/v2/config"
 	"github.com/tikv/client-go/v2/rawkv"
@@ -27,7 +28,7 @@ func main() {
 		log.Fatal("no clusters found")
 	}
 	ctx := context.Background()
-
+	cache := utils.NewCache()
 	// Create TiKV RawKV client for default cluster
 	cli, err := rawkv.NewClient(ctx, clusters[0].PDAddrs, config.DefaultConfig().Security)
 	if err != nil {
@@ -36,12 +37,21 @@ func main() {
 
 	log.Printf("Connected to default TiKV cluster ID: %d", cli.ClusterID())
 
-	srv := server.New(cli, clusters[0].PDAddrs, clusters[0].Name)
+	srv := server.New(cli, clusters[0].PDAddrs, clusters[0].Name, cache)
 	defer srv.Close()
 
 	for _, cluster := range clusters[1:] {
 		srv.AddCluster(ctx, cluster.Name, cluster.PDAddrs)
 	}
+
+	// Start metrics monitor with dynamic PD address from active cluster
+	metrics := services.NewMonitor(
+		srv.GetActivePDAddr,
+		srv.GetActiveClusterName,
+		5*time.Second,
+		cache,
+	)
+	metrics.Start(ctx)
 
 	mux := http.NewServeMux()
 
@@ -58,6 +68,9 @@ func main() {
 	mux.HandleFunc("/api/raw/put", handlers.Put(srv))
 	mux.HandleFunc("/api/raw/delete", handlers.Delete(srv))
 	mux.HandleFunc("/api/raw/scan", handlers.Scan(srv))
+
+	// Metrics
+	mux.HandleFunc("/api/metrics", handlers.Metrics(srv))
 
 	// Serve static files (Frontend)
 	// In Docker, we will copy the built 'out' directory to 'public'

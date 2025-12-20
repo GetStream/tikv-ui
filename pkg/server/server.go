@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/GetStream/tikv-ui/pkg/utils"
 	"github.com/tikv/client-go/v2/rawkv"
 )
 
@@ -22,10 +23,11 @@ type Server struct {
 	clusters       map[string]*ClusterConnection
 	activeCluster  string
 	defaultPDAddrs []string
+	Cache          *utils.Cache
 }
 
 // New creates a new Server instance with an initial connection
-func New(client *rawkv.Client, pdAddrs []string, name string) *Server {
+func New(client *rawkv.Client, pdAddrs []string, name string, cache *utils.Cache) *Server {
 	defaultConn := &ClusterConnection{
 		Name:      name,
 		PDAddrs:   pdAddrs,
@@ -39,6 +41,7 @@ func New(client *rawkv.Client, pdAddrs []string, name string) *Server {
 		},
 		activeCluster:  name,
 		defaultPDAddrs: pdAddrs,
+		Cache:          cache,
 	}
 }
 
@@ -110,6 +113,17 @@ func (s *Server) GetActiveClusterName() string {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.activeCluster
+}
+
+// GetActivePDAddr returns the first PD address of the active cluster
+func (s *Server) GetActivePDAddr() string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	if conn, ok := s.clusters[s.activeCluster]; ok && len(conn.PDAddrs) > 0 {
+		return conn.PDAddrs[0]
+	}
+	return ""
 }
 
 // Close closes all cluster connections
