@@ -138,6 +138,12 @@ The server exposes a set of endpoints for cluster management and raw data operat
 | POST   | /api/raw/delete | Delete a key-value pair.               | `{"key": "mykey"}`                                 |
 | POST   | /api/raw/scan   | Scan a range of keys.                  | `{"start_key": "a", "end_key": "z", "limit": 100}` |
 
+### Metrics
+
+| Method | Endpoint | Description                            |
+| ------ | -------- | -------------------------------------- |
+| GET    | /metrics | PD and TiKV metrics from the instances |
+
 ## 🤝 Contributing
 
 We welcome contributions from the community! If you're interested in making the TiKV Admin Web UI even better:

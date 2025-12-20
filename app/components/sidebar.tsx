@@ -1,39 +1,21 @@
+"use client";
+
 import { useState } from "react";
 import { Button } from "./ui/button";
-import { PlusIcon, SettingsIcon } from "lucide-react";
+import { ListIcon, ServerIcon, SettingsIcon } from "lucide-react";
 import Image from "next/image";
 import TiKV from "@/assets/img/tikv.webp";
 import { SettingsDialog } from "./dialogs/settings";
-import { AddKeyDialog } from "./dialogs/addkey";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { useCluster } from "@/hooks/use-cluster";
+import { useKeys } from "@/hooks/use-keys";
 
-interface SidebarProps {
-  addKey: (key: string, value: string) => Promise<void>;
-  loadKeys: (key: string, endKey: string, reverse: boolean) => void;
-  getNextKey: (key: string) => string;
-  searchQuery: string;
-  listClusters: () => void;
-}
-
-export default function Sidebar({
-  addKey,
-  loadKeys,
-  getNextKey,
-  searchQuery,
-  listClusters,
-}: SidebarProps) {
+export default function Sidebar() {
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
-
-  const handleAddWrapper = async (key: string, value: string) => {
-    await addKey(key, value);
-    // Refresh list
-    if (searchQuery) {
-      const endKey = getNextKey(searchQuery);
-      loadKeys(searchQuery, endKey, true);
-    } else {
-      loadKeys("", "", true);
-    }
-  };
+  const path = usePathname();
+  const { listClusters } = useCluster();
+  const { loadKeys } = useKeys();
   return (
     <>
       <div className="p-4 flex flex-col justify-between items-center bg-menu">
@@ -42,12 +24,30 @@ export default function Sidebar({
         </a>
         <div className="flex flex-col items-center gap-2">
           <Button
-            variant="ghost"
+            asChild
+            variant={path === "/" ? "secondary" : "ghost"}
             size="icon-lg"
             className="rounded-full"
-            onClick={() => setAddDialogOpen(true)}
           >
-            <PlusIcon />
+            <Link href="/">
+              <ListIcon
+                stroke={path === "/" ? "var(--color-primary)" : "currentColor"}
+              />
+            </Link>
+          </Button>
+          <Button
+            asChild
+            variant={path === "/metrics" ? "secondary" : "ghost"}
+            size="icon-lg"
+            className="rounded-full"
+          >
+            <Link href="/metrics">
+              <ServerIcon
+                stroke={
+                  path === "/metrics" ? "var(--color-primary)" : "currentColor"
+                }
+              />
+            </Link>
           </Button>
           <Button
             variant="ghost"
@@ -66,12 +66,6 @@ export default function Sidebar({
           listClusters();
           loadKeys("", "", true);
         }}
-      />
-
-      <AddKeyDialog
-        open={addDialogOpen}
-        onOpenChange={setAddDialogOpen}
-        onAdd={handleAddWrapper}
       />
     </>
   );

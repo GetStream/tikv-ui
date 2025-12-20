@@ -4,6 +4,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import TiKV from "@/assets/img/tikv.webp";
+import Sidebar from "@/components/sidebar";
+import Provider from "@/components/provider";
+import Cluster from "@/components/cluster";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,8 +36,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
-        <Toaster position="bottom-right" />
+        <Provider>
+          <div className="flex flex-1 flex-row h-screen">
+            <Sidebar />
+            {children}
+          </div>
+          <Cluster />
+          <Toaster position="bottom-right" />
+        </Provider>
       </body>
     </html>
   );
