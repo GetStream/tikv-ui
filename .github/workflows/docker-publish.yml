@@ -1,8 +1,6 @@
 name: Docker
 
 on:
-  push:
-    branches: ["master"]
   pull_request:
     branches: ["master"]
   release:
@@ -13,49 +11,31 @@ env:
   IMAGE_NAME: getstream/tikv-ui
 
 jobs:
-  build:
-    # Build only for pushes/PRs, never for release
-    if: github.event_name != 'release'
+  # Fast validation build for PRs (single platform, no push)
+  validate:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
-      id-token: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Set up QEMU for multi-arch builds
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Extract Docker metadata (non-release)
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-
-      - name: Build Docker image (no push)
-        id: build
+      - name: Build Docker image (validation only)
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+  # Full multi-arch build, push, and sign for releases
   release:
-    # Only run when a GitHub Release is published
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     permissions:
@@ -72,7 +52,6 @@ jobs:
         with:
           cosign-release: "v2.2.4"
 
-      # Set up QEMU for multi-arch builds
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -86,7 +65,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract Docker metadata (release)
+      - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
