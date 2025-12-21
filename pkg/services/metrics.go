@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/GetStream/tikv-ui/pkg/types"
@@ -65,11 +66,14 @@ func (m *Monitor) pollStores(ctx context.Context) {
 		log.Printf("pd metrics: no active cluster name")
 		return
 	}
-
+	storesURL := pdAddr + "/pd/api/v1/stores"
+	if !strings.HasPrefix(pdAddr, "http") {
+		storesURL = "http://" + pdAddr + "/pd/api/v1/stores"
+	}
 	req, err := http.NewRequestWithContext(
 		ctx,
 		http.MethodGet,
-		"http://"+pdAddr+"/pd/api/v1/stores",
+		storesURL,
 		nil,
 	)
 	if err != nil {
@@ -137,7 +141,10 @@ func (m *Monitor) pollTiKVMetrics(ctx context.Context) {
 			continue
 		}
 
-		metricsURL := "http://" + statusAddr + "/metrics"
+		metricsURL := statusAddr + "/metrics"
+		if !strings.HasPrefix(statusAddr, "http") {
+			metricsURL = "http://" + statusAddr + "/metrics"
+		}
 		newMetrics, err := m.fetchNodeMetrics(ctx, metricsURL, statusAddr)
 		if err != nil {
 			log.Printf("tikv metrics: node %s error: %v", statusAddr, err)
