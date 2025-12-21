@@ -75,18 +75,33 @@ func main() {
 	// Serve static files (Frontend)
 	// In Docker, we will copy the built 'out' directory to 'public'
 	staticDir := "./public"
-	fs := http.FileServer(http.Dir(staticDir))
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// Calculate the file path
 		path := staticDir + r.URL.Path
 
-		// Check if file exists, otherwise serve index.html (SPA fallback)
-		if _, err := os.Stat(path); os.IsNotExist(err) {
-			http.ServeFile(w, r, staticDir+"/index.html")
+		// Check if exact file exists (e.g., /favicon.ico, /_next/static/...)
+		if info, err := os.Stat(path); err == nil && !info.IsDir() {
+			http.ServeFile(w, r, path)
 			return
 		}
 
-		fs.ServeHTTP(w, r)
+		// For routes like /metrics, try serving metrics.html (Next.js static export)
+		if r.URL.Path != "/" {
+			htmlPath := path + ".html"
+			if info, err := os.Stat(htmlPath); err == nil && !info.IsDir() {
+				http.ServeFile(w, r, htmlPath)
+				return
+			}
+
+			// Also check for directory with index.html (e.g., /metrics/index.html)
+			indexPath := path + "/index.html"
+			if info, err := os.Stat(indexPath); err == nil && !info.IsDir() {
+				http.ServeFile(w, r, indexPath)
+				return
+			}
+		}
+
+		// Default: serve index.html (home page or SPA fallback)
+		http.ServeFile(w, r, staticDir+"/index.html")
 	})
 	port := os.Getenv("PORT")
 	if port == "" {
