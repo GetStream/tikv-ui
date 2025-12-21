@@ -187,7 +187,7 @@ export default function MetricsPage() {
                   </div>
                   <ChartContainer config={dynamicConfig}>
                     {series.length > 1 ? (
-                      <LineChart data={chartData.slice(0, 8)}>
+                      <LineChart data={chartData}>
                         <ChartTooltip
                           content={
                             <ChartTooltipContent
