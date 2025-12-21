@@ -76,28 +76,27 @@ func main() {
 	// In Docker, we will copy the built 'out' directory to 'public'
 	staticDir := "./public"
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		path := staticDir + r.URL.Path
-
-		// Check if exact file exists (e.g., /favicon.ico, /_next/static/...)
-		if info, err := os.Stat(path); err == nil && !info.IsDir() {
-			http.ServeFile(w, r, path)
-			return
+		// Clean the path (remove trailing slashes except for root)
+		urlPath := r.URL.Path
+		if urlPath != "/" && urlPath[len(urlPath)-1] == '/' {
+			urlPath = urlPath[:len(urlPath)-1]
 		}
+		path := staticDir + urlPath
 
-		// For routes like /metrics, try serving metrics.html (Next.js static export)
-		if r.URL.Path != "/" {
+		// For non-root paths, try serving the .html file first (Next.js static export)
+		// This handles /metrics -> metrics.html
+		if urlPath != "/" {
 			htmlPath := path + ".html"
 			if info, err := os.Stat(htmlPath); err == nil && !info.IsDir() {
 				http.ServeFile(w, r, htmlPath)
 				return
 			}
+		}
 
-			// Also check for directory with index.html (e.g., /metrics/index.html)
-			indexPath := path + "/index.html"
-			if info, err := os.Stat(indexPath); err == nil && !info.IsDir() {
-				http.ServeFile(w, r, indexPath)
-				return
-			}
+		// Check if exact file exists (e.g., /favicon.ico, /_next/static/...)
+		if info, err := os.Stat(path); err == nil && !info.IsDir() {
+			http.ServeFile(w, r, path)
+			return
 		}
 
 		// Default: serve index.html (home page or SPA fallback)
