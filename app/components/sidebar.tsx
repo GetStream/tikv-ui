@@ -37,14 +37,18 @@ export default function Sidebar() {
           </Button>
           <Button
             asChild
-            variant={path === "/metrics" ? "secondary" : "ghost"}
+            variant={
+              ["/metrics", "/metrics/"].includes(path) ? "secondary" : "ghost"
+            }
             size="icon-lg"
             className="rounded-full"
           >
             <Link href="/metrics">
               <ServerIcon
                 stroke={
-                  path === "/metrics" ? "var(--color-primary)" : "currentColor"
+                  ["/metrics", "/metrics/"].includes(path)
+                    ? "var(--color-primary)"
+                    : "currentColor"
                 }
               />
             </Link>
