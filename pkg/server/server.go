@@ -126,6 +126,29 @@ func (s *Server) GetActivePDAddr() string {
 	return ""
 }
 
+// ClusterInfo holds basic cluster information for metrics polling
+type ClusterInfo struct {
+	Name   string
+	PDAddr string
+}
+
+// GetAllClusters returns info for all clusters (for metrics polling)
+func (s *Server) GetAllClusters() []ClusterInfo {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	clusters := make([]ClusterInfo, 0, len(s.clusters))
+	for _, conn := range s.clusters {
+		if len(conn.PDAddrs) > 0 {
+			clusters = append(clusters, ClusterInfo{
+				Name:   conn.Name,
+				PDAddr: conn.PDAddrs[0],
+			})
+		}
+	}
+	return clusters
+}
+
 // Close closes all cluster connections
 func (s *Server) Close() {
 	s.mu.Lock()

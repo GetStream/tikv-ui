@@ -44,10 +44,16 @@ func main() {
 		srv.AddCluster(ctx, cluster.Name, cluster.PDAddrs)
 	}
 
-	// Start metrics monitor with dynamic PD address from active cluster
+	// Start metrics monitor for all clusters
 	metrics := services.NewMonitor(
-		srv.GetActivePDAddr,
-		srv.GetActiveClusterName,
+		func() []services.ClusterInfo {
+			clusters := srv.GetAllClusters()
+			result := make([]services.ClusterInfo, len(clusters))
+			for i, c := range clusters {
+				result[i] = services.ClusterInfo{Name: c.Name, PDAddr: c.PDAddr}
+			}
+			return result
+		},
 		5*time.Second,
 		cache,
 	)

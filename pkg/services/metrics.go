@@ -13,22 +13,26 @@ import (
 	"github.com/GetStream/tikv-ui/pkg/utils"
 )
 
-type Monitor struct {
-	getPDAddr      func() string
-	getClusterName func() string
-	interval       time.Duration
-	client         *http.Client
-	cache          *utils.Cache
+// ClusterInfo holds basic cluster information for metrics polling
+type ClusterInfo struct {
+	Name   string
+	PDAddr string
 }
 
-func NewMonitor(getPDAddr func() string, getClusterName func() string, interval time.Duration, cache *utils.Cache) *Monitor {
+type Monitor struct {
+	getClusters func() []ClusterInfo
+	interval    time.Duration
+	client      *http.Client
+	cache       *utils.Cache
+}
+
+func NewMonitor(getClusters func() []ClusterInfo, interval time.Duration, cache *utils.Cache) *Monitor {
 	return &Monitor{
-		getPDAddr:      getPDAddr,
-		getClusterName: getClusterName,
-		interval:       interval,
-		cache:          cache,
+		getClusters: getClusters,
+		interval:    interval,
+		cache:       cache,
 		client: &http.Client{
-			Timeout: 10 * time.Second,
+			Timeout: 60 * time.Second,
 		},
 	}
 }
@@ -36,8 +40,7 @@ func NewMonitor(getPDAddr func() string, getClusterName func() string, interval 
 func (m *Monitor) Start(ctx context.Context) {
 	ticker := time.NewTicker(m.interval)
 
-	m.pollStores(ctx)
-	m.pollTiKVMetrics(ctx)
+	m.pollAllClusters(ctx)
 
 	go func() {
 		defer ticker.Stop()
@@ -47,28 +50,34 @@ func (m *Monitor) Start(ctx context.Context) {
 			case <-ctx.Done():
 				return
 			case <-ticker.C:
-				go m.pollStores(ctx)
-				go m.pollTiKVMetrics(ctx)
+				go m.pollAllClusters(ctx)
 			}
 		}
 	}()
 }
 
-func (m *Monitor) pollStores(ctx context.Context) {
-	pdAddr := m.getPDAddr()
-	if pdAddr == "" {
-		log.Printf("pd metrics: no active PD address")
+func (m *Monitor) pollAllClusters(ctx context.Context) {
+	clusters := m.getClusters()
+	if len(clusters) == 0 {
+		log.Printf("metrics: no clusters available")
 		return
 	}
 
-	clusterName := m.getClusterName()
-	if clusterName == "" {
-		log.Printf("pd metrics: no active cluster name")
+	for _, cluster := range clusters {
+		m.pollStores(ctx, cluster)
+		m.pollTiKVMetrics(ctx, cluster.Name)
+	}
+}
+
+func (m *Monitor) pollStores(ctx context.Context, cluster ClusterInfo) {
+	if cluster.PDAddr == "" {
+		log.Printf("pd metrics [%s]: no PD address", cluster.Name)
 		return
 	}
-	storesURL := pdAddr + "/pd/api/v1/stores"
-	if !strings.HasPrefix(pdAddr, "http") {
-		storesURL = "http://" + pdAddr + "/pd/api/v1/stores"
+
+	storesURL := cluster.PDAddr + "/pd/api/v1/stores"
+	if !strings.HasPrefix(cluster.PDAddr, "http") {
+		storesURL = "http://" + cluster.PDAddr + "/pd/api/v1/stores"
 	}
 	req, err := http.NewRequestWithContext(
 		ctx,
@@ -77,25 +86,25 @@ func (m *Monitor) pollStores(ctx context.Context) {
 		nil,
 	)
 	if err != nil {
-		log.Printf("pd metrics: request error: %v", err)
+		log.Printf("pd metrics [%s]: request error: %v", cluster.Name, err)
 		return
 	}
 
 	resp, err := m.client.Do(req)
 	if err != nil {
-		log.Printf("pd metrics: http error: %v", err)
+		log.Printf("pd metrics [%s]: http error: %v", cluster.Name, err)
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		log.Printf("pd metrics: bad status %d", resp.StatusCode)
+		log.Printf("pd metrics [%s]: bad status %d", cluster.Name, resp.StatusCode)
 		return
 	}
 
 	var data types.PDStoresResponse
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Printf("pd metrics: decode error: %v", err)
+		log.Printf("pd metrics [%s]: decode error: %v", cluster.Name, err)
 		return
 	}
 
@@ -103,26 +112,20 @@ func (m *Monitor) pollStores(ctx context.Context) {
 		return data.Stores[i].Store.ID < data.Stores[j].Store.ID
 	})
 
-	m.cache.Set("metrics:"+clusterName, "pd", data)
+	m.cache.Set("metrics:"+cluster.Name, "pd", data)
 }
 
-func (m *Monitor) pollTiKVMetrics(ctx context.Context) {
-	clusterName := m.getClusterName()
-	if clusterName == "" {
-		log.Printf("tikv metrics: no active cluster name")
-		return
-	}
-
+func (m *Monitor) pollTiKVMetrics(ctx context.Context, clusterName string) {
 	// Get stores from cache
 	cached, ok := m.cache.Get("metrics:"+clusterName, "pd")
 	if !ok {
-		log.Printf("tikv metrics: no PD stores in cache for cluster %s", clusterName)
+		log.Printf("tikv metrics [%s]: no PD stores in cache", clusterName)
 		return
 	}
 
 	pdData, ok := cached.(types.PDStoresResponse)
 	if !ok {
-		log.Printf("tikv metrics: invalid PD cache data")
+		log.Printf("tikv metrics [%s]: invalid PD cache data", clusterName)
 		return
 	}
 
@@ -147,7 +150,7 @@ func (m *Monitor) pollTiKVMetrics(ctx context.Context) {
 		}
 		newMetrics, err := m.fetchNodeMetrics(ctx, metricsURL, statusAddr)
 		if err != nil {
-			log.Printf("tikv metrics: node %s error: %v", statusAddr, err)
+			log.Printf("tikv metrics [%s]: node %s error: %v", clusterName, statusAddr, err)
 			continue
 		}
 
