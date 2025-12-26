@@ -8,29 +8,17 @@ import {
   ClockIcon,
   HeartIcon,
   HardDriveIcon,
-  InfoIcon,
   ChartSplineIcon,
   ServerCrashIcon,
 } from "lucide-react";
-import { Area, AreaChart, Line, LineChart, XAxis, YAxis } from "recharts";
-import {
-  type ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MetricCard } from "@/components/ui/metric-card";
 import { Spinner } from "@/components/ui/spinner";
+import { GaugeChart } from "@/components/metrics/gauge-chart";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import {
-  parseBytes,
-  formatUptime,
-  getFormatter,
-  processGaugeData,
-} from "@/lib/utils";
+import { parseBytes, formatUptime } from "@/lib/utils";
 
 dayjs.extend(relativeTime);
 
@@ -162,145 +150,14 @@ export default function MetricsPage() {
             TiKV Overview
           </div>
           <div className="grid gap-4 pb-30 grid-cols-1 md:grid-cols-3 3xl:grid-cols-4 ">
-            {data?.tikv?.gauges.map((gauge: any, i: number) => {
-              const { data: chartData, series } = processGaugeData(
-                gauge.points
-              );
-
-              const formatter = getFormatter(gauge.unit);
-
-              const dynamicConfig: ChartConfig = {
-                ...series.reduce((acc, key, index) => {
-                  const colorVar = `--chart-${(index % 5) + 1}`;
-                  acc[key] = {
-                    label: key,
-                    color: `var(${colorVar})`,
-                  };
-                  return acc;
-                }, {} as Record<string, { label: string; color: string }>),
-              };
-
-              return (
-                <MetricCard key={gauge.name + i}>
-                  <div className="font-semibold text-gray-500 mb-10 flex items-center justify-between">
-                    <span>{gauge.name}</span>
-                  </div>
-                  <ChartContainer config={dynamicConfig}>
-                    {series.length > 1 ? (
-                      <LineChart data={chartData}>
-                        <ChartTooltip
-                          content={
-                            <ChartTooltipContent
-                              formatter={(value, name, item) => (
-                                <div className="flex flex-1 justify-between items-center gap-4">
-                                  <div className="flex items-center gap-2">
-                                    <div
-                                      className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
-                                      style={{ backgroundColor: item.color }}
-                                    />
-                                    <span className="text-muted-foreground truncate max-w-[150px]">
-                                      {name}
-                                    </span>
-                                  </div>
-                                  <span className="font-mono font-medium">
-                                    {formatter(value as number)}
-                                  </span>
-                                </div>
-                              )}
-                            />
-                          }
-                        />
-                        <XAxis
-                          dataKey="ts"
-                          tickFormatter={(value) =>
-                            dayjs(value).format("HH:mm")
-                          }
-                        />
-                        <YAxis tickFormatter={formatter} width={70} />
-                        {series.slice(0, 10).map((key) => (
-                          <Line
-                            key={key}
-                            dataKey={key}
-                            type="monotone"
-                            stroke={dynamicConfig[key]?.color}
-                            strokeWidth={2}
-                            dot={false}
-                          />
-                        ))}
-                      </LineChart>
-                    ) : (
-                      <AreaChart data={chartData}>
-                        <ChartTooltip
-                          content={
-                            <ChartTooltipContent
-                              formatter={(value, name, item) => (
-                                <div className="flex flex-1 justify-between items-center gap-4">
-                                  <div className="flex items-center gap-2">
-                                    <div
-                                      className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
-                                      style={{ backgroundColor: item.color }}
-                                    />
-                                    <span className="text-muted-foreground truncate max-w-[150px]">
-                                      {name}
-                                    </span>
-                                  </div>
-                                  <span className="font-mono font-medium">
-                                    {formatter(value as number)}
-                                  </span>
-                                </div>
-                              )}
-                            />
-                          }
-                        />
-                        <XAxis
-                          dataKey="ts"
-                          tickFormatter={(value) =>
-                            dayjs(value).format("HH:mm")
-                          }
-                        />
-                        <YAxis tickFormatter={formatter} width={70} />
-                        <defs>
-                          {series.map((key, index) => (
-                            <linearGradient
-                              key={key}
-                              id={`gradient-${i}-${index}`}
-                              x1="0"
-                              y1="0"
-                              x2="0"
-                              y2="1"
-                            >
-                              <stop
-                                offset="5%"
-                                stopColor={dynamicConfig[key]?.color}
-                                stopOpacity={0.5}
-                              />
-                              <stop
-                                offset="95%"
-                                stopColor={dynamicConfig[key]?.color}
-                                stopOpacity={0.1}
-                              />
-                            </linearGradient>
-                          ))}
-                        </defs>
-                        {series.map((key, index) => (
-                          <Area
-                            key={key}
-                            dataKey={key}
-                            type="basis"
-                            fill={`url(#gradient-${i}-${index})`}
-                            fillOpacity={0.2}
-                            stroke={dynamicConfig[key]?.color}
-                          />
-                        ))}
-                      </AreaChart>
-                    )}
-                  </ChartContainer>
-                  <div className="text-xs text-gray-600 flex items-center gap-1">
-                    <InfoIcon size={12} /> {gauge.description}
-                  </div>
-                </MetricCard>
-              );
-            })}
+            {data?.tikv?.gauges.map((gauge: any, i: number) => (
+              <GaugeChart
+                key={gauge.name + i}
+                gauge={gauge}
+                index={i}
+                stores={data?.pd?.stores || []}
+              />
+            ))}
           </div>
         </ScrollArea>
       )}
