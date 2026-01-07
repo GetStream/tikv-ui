@@ -80,7 +80,7 @@ func (dest *ScrapeResponse) Merge(fresh ScrapeResponse, window time.Duration) {
 
 		for _, newPt := range freshGauge.Points {
 			key := minuteKey(newPt.Labels, newPt.Ts)
-			if existingIdx, ok := minuteIndex[key]; ok {
+			if existingIdx, ok := minuteIndex[key]; ok && existingIdx < len(destGauge.Points) {
 				destGauge.Points[existingIdx].Value = newPt.Value
 			} else {
 				destGauge.Points = append(destGauge.Points, newPt)
