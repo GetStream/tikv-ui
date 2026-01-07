@@ -144,6 +144,9 @@ The server exposes a set of endpoints for cluster management and raw data operat
 | ------ | -------- | -------------------------------------- |
 | GET    | /metrics | PD and TiKV metrics from the instances |
 
+<img width="1245" height="736" alt="tikvui-mtrics" src="https://github.com/user-attachments/assets/25e79ee9-76d2-4d0c-9f97-2732067ddbec" />
+
+
 ## 🤝 Contributing
 
 We welcome contributions from the community! If you're interested in making the TiKV Admin Web UI even better:
