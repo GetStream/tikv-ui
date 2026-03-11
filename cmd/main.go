@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -23,6 +24,8 @@ func main() {
 	if pdAddrsEnv == "" {
 		log.Fatal("TIKV_PD_ADDRS env var is required (comma-separated PD addresses)")
 	}
+	metricsScrapeInterval := getDurationEnv("TIKV_UI_METRICS_SCRAPE_INTERVAL", 5*time.Second)
+
 	clusters := utils.GetClusters(pdAddrsEnv)
 	if len(clusters) == 0 {
 		log.Fatal("no clusters found")
@@ -54,7 +57,7 @@ func main() {
 			}
 			return result
 		},
-		5*time.Second,
+		metricsScrapeInterval,
 		cache,
 	)
 	metrics.Start(ctx)
@@ -136,7 +139,23 @@ func main() {
 
 	log.Println("TiKV explorer API listening on :" + port)
 	log.Println("Cluster management: POST /api/clusters/connect, GET /api/clusters, POST /api/clusters/switch")
+	log.Printf("Metrics scrape interval: %s", metricsScrapeInterval)
 	if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("server error: %v", err)
 	}
+}
+
+func getDurationEnv(key string, fallback time.Duration) time.Duration {
+	value := strings.TrimSpace(os.Getenv(key))
+	if value == "" {
+		return fallback
+	}
+
+	duration, err := time.ParseDuration(value)
+	if err != nil || duration <= 0 {
+		log.Printf("invalid %s=%q, using default %s", key, value, fallback)
+		return fallback
+	}
+
+	return duration
 }
