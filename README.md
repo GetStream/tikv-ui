@@ -94,6 +94,9 @@ at least one host is required, other params are optional
 # Set your TiKV PD addresses (required)
 export TIKV_PD_ADDRS="127.0.0.1:2379"
 
+# Optional: slow down backend metrics scraping to reduce network traffic
+export TIKV_UI_METRICS_SCRAPE_INTERVAL="30s"
+
 # Run the server
 ./bin/tikv-ui
 

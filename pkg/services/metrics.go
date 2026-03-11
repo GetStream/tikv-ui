@@ -50,7 +50,8 @@ func (m *Monitor) Start(ctx context.Context) {
 			case <-ctx.Done():
 				return
 			case <-ticker.C:
-				go m.pollAllClusters(ctx)
+				// Run scrapes serially so slow polls do not stack up.
+				m.pollAllClusters(ctx)
 			}
 		}
 	}()
