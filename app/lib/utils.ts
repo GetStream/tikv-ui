@@ -5,6 +5,48 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/** Decode API raw_value (plain text or base64-encoded binary) to a display string. */
+export function formatRawValue(raw: string): string {
+  if (!raw) return "";
+
+  try {
+    const binary = atob(raw);
+    const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+    const hex = Array.from(bytes)
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join(" ");
+
+    let text = "";
+    for (const b of bytes) {
+      if (b >= 0x20 && b <= 0x7e) {
+        text += String.fromCharCode(b);
+      } else if (b === 0x0a) {
+        text += "\\n";
+      } else if (b === 0x0d) {
+        text += "\\r";
+      } else if (b === 0x09) {
+        text += "\\t";
+      } else {
+        text += ".";
+      }
+    }
+
+    return `hex: ${hex}\n\nascii: ${text}`;
+  } catch {
+    return raw;
+  }
+}
+
+/** Byte length of an API raw_value string. */
+export function rawValueByteLength(raw: string): number {
+  if (!raw) return 0;
+  try {
+    return atob(raw).length;
+  } catch {
+    return new TextEncoder().encode(raw).length;
+  }
+}
+
 export function formatBytes(bytes: number, decimals = 2) {
   if (!+bytes) return "0 Bytes";
 

@@ -7,7 +7,7 @@ import {
   KeyIcon,
   TrashIcon,
 } from "lucide-react";
-import { formatBytes } from "@/lib/utils";
+import { formatBytes, rawValueByteLength } from "@/lib/utils";
 
 interface KeyDetailsHeaderProps {
   selectedItem: ScanItem | null;
@@ -30,7 +30,7 @@ export function KeyDetailsHeader({
         <KeyIcon size={14} strokeWidth={3} />
         {selectedItem.key}
         <span className="text-xs text-muted-foreground ml-2 font-normal">
-          ({formatBytes(selectedItem.raw_value.length)})
+          ({formatBytes(rawValueByteLength(selectedItem.raw_value))})
         </span>
       </div>
 

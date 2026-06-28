@@ -1,5 +1,6 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ScanItem } from "@/hooks/use-keys";
+import { formatRawValue } from "@/lib/utils";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
@@ -29,7 +30,7 @@ export function KeyDetailsContent({
               {JSON.stringify(selectedItem.value, null, 2)}
             </SyntaxHighlighter>
           ) : (
-            selectedItem.raw_value
+            formatRawValue(selectedItem.raw_value)
           )}
         </div>
       </div>

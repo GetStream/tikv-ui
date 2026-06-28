@@ -40,11 +40,11 @@ func Scan(s *server.Server) http.HandlerFunc {
 
 		items := make([]types.ScanItem, 0, len(keys))
 		for i := range keys {
-			parsed, raw := utils.ParseValue(values[i])
+			parsed, _ := utils.ParseValue(values[i])
 			items = append(items, types.ScanItem{
 				Key:      string(keys[i]),
 				Value:    parsed,
-				RawValue: raw,
+				RawValue: utils.FormatRawValue(values[i]),
 			})
 		}
 
