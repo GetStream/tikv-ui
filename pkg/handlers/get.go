@@ -42,7 +42,8 @@ func Get(s *server.Server) http.HandlerFunc {
 			Key: req.Key,
 		}
 		if val != nil {
-			resp.Value, resp.RawValue = utils.ParseValue(val)
+			resp.Value, _ = utils.ParseValue(val)
+			resp.RawValue = utils.FormatRawValue(val)
 			resp.Found = true
 		}
 
