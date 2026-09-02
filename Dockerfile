@@ -20,10 +20,14 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o server cmd/main.
 # Stage 3: Final Image
 FROM alpine:3.23.0
 WORKDIR /app
-RUN apk --no-cache add ca-certificates
+RUN apk --no-cache add ca-certificates \
+    && addgroup -S -g 10001 app \
+    && adduser -S -D -H -u 10001 -G app app
 
-COPY --from=backend-builder /app/server .
-COPY --from=frontend-builder /app/out ./public
+COPY --from=backend-builder --chown=app:app /app/server .
+COPY --from=frontend-builder --chown=app:app /app/out ./public
+
+USER app
 
 EXPOSE 8081
 CMD ["./server"]
